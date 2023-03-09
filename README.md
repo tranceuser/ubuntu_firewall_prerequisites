@@ -5,6 +5,20 @@ This guide will walk you through the process of installing IPTables, Ipset, Conn
 ## Prerequisites
 Before we begin, you should have a working installation of Ubuntu Server 22.04, with root or sudo privileges. You should also have basic knowledge of the terminal and command-line interface.
 
+## Uninstall the default firewall in Ubuntu
+1. Type the following command to stop the firewall service:
+```
+sudo systemctl stop ufw
+```
+2. Disable the firewall service by typing the following command:
+```
+sudo systemctl disable ufw
+```
+3. Finally, you can remove the ufw package by typing the following command:
+```
+sudo apt-get remove ufw
+```
+
 ## Installing IPTables
 To install IPTables, use the following command:
 ```

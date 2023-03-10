@@ -5,6 +5,11 @@ This guide will walk you through the process of installing IPTables, Ipset and C
 ## Prerequisites
 Before we begin, you should have a working installation of Ubuntu Server 22.04, with root or sudo privileges. You should also have basic knowledge of the terminal and command-line interface.
 
+Update your package list:
+```
+sudo apt update -y
+```
+
 ## Uninstall the default firewall in Ubuntu
 1. Type the following command to stop the firewall service:
 ```
@@ -16,7 +21,7 @@ sudo systemctl disable ufw
 ```
 3. Finally, you can remove the ufw package by typing the following command:
 ```
-sudo apt-get remove ufw
+sudo apt-get remove ufw -y
 ```
 
 ## Installing IPTables
@@ -49,7 +54,37 @@ Once the installation is complete, you can verify the installation by running th
 ```
 sudo conntrack -V
 ```
-## Save & Restore service
+
+## netfilter-persistent
+
+ipset-persistent, iptables-persistent, and netfilter-persistent are packages for Ubuntu Server that allow you to save and load your IPSET and IPTABLES rules automatically on boot. This ensures that your firewall settings are always loaded, even after a reboot.
+
+1. Install the packages:
+```
+sudo apt install ipset-persistent iptables-persistent netfilter-persistent -y
+```
+2. Once the installation is complete, netfilter-persistent services should be automatically started. You can check their status using the systemctl command:
+```
+sudo systemctl status netfilter-persistent
+```
+If the services are running, you should see a message indicating that they are active (running).
+
+3. To save your IPSET and IPTABLES rules, use the following commands:
+```
+sudo ipset save > /etc/ipset.rules
+sudo iptables-save > /etc/iptables/rules.v4
+sudo netfilter-persistent save
+```
+4. To start the services, use the following commands:
+```
+sudo systemctl start netfilter-persistent
+```
+5. You can save both ipset and iptables configurations by running the command:
+```
+service netfilter-persistent save
+```
+
+## Save & Restore service (Alternative to netfilter-persistent)
 1. Create a new systemd service file by running the following command:
 ```
 sudo nano /etc/systemd/system/iptables-save.service

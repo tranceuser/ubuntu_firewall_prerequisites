@@ -42,7 +42,7 @@ sudo apt-get install ipset -y
 ```
 Once the installation is complete, you can verify the installation by running the following command:
 ```
-sudo ipset -version
+sudo ipset -V
 ```
 
 ## Installing Conntrack

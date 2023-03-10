@@ -1,6 +1,6 @@
-# Installing IPTables, Ipset and Conntrack on Ubuntu Server 22.04
+# Installing IPTables, Ipset, Conntrack and netfilter-persistent on Ubuntu Server 22.04
 
-This guide will walk you through the process of installing IPTables, Ipset and Conntrack on Ubuntu Server 22.04.
+This guide will walk you through the process of installing IPTables, Ipset, Conntrack and netfilter-persistent on Ubuntu Server 22.04.
 
 ## Prerequisites
 Before we begin, you should have a working installation of Ubuntu Server 22.04, with root or sudo privileges. You should also have basic knowledge of the terminal and command-line interface.

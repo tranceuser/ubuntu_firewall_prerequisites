@@ -1,6 +1,6 @@
-# Installing IPTables, Ipset, Conntrack, and Netfilter-Persistent on Ubuntu Server 22.04
+# Installing IPTables, Ipset and Conntrack on Ubuntu Server 22.04
 
-This guide will walk you through the process of installing IPTables, Ipset, Conntrack, and Netfilter-Persistent on Ubuntu Server 22.04.
+This guide will walk you through the process of installing IPTables, Ipset and Conntrack on Ubuntu Server 22.04.
 
 ## Prerequisites
 Before we begin, you should have a working installation of Ubuntu Server 22.04, with root or sudo privileges. You should also have basic knowledge of the terminal and command-line interface.
@@ -27,7 +27,7 @@ sudo apt-get install iptables -y
 
 Once the installation is complete, you can verify the installation by running the following command:
 ```
-sudo iptables -v
+sudo iptables -V
 ```
 
 ## Installing Ipset
@@ -49,36 +49,40 @@ Once the installation is complete, you can verify the installation by running th
 ```
 sudo conntrack -V
 ```
+## Save & Restore service
+1. Create a new systemd service file by running the following command:
+```
+sudo nano /etc/systemd/system/iptables-save.service
+```
+2. Paste the following content into the file:
+```
+[Unit]
+Description=Save and restore ipset and iptables rules
+Before=network.target
 
-## Installing Netfilter-Persistent
-To install Netfilter-Persistent, use the following command:
-```
-sudo apt-get install netfilter-persistent -y
-```
-Once the installation is complete, you can verify the installation by running the following command:
-```
-sudo netfilter-persistent version
-```
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/bash -c '/sbin/ipset restore < /etc/iptables/ipset.rules && /sbin/iptables-restore < /etc/iptables/rules.v4'
+ExecStop=/bin/bash -c '/sbin/ipset save > /etc/iptables/ipset.rules && /sbin/iptables-save > /etc/iptables/rules.v4'
 
-netfilter-persistent will automatically run at startup on Ubuntu Server 22.04. This means that your firewall rules, including those created using ipset, will be restored and reapplied after every reboot.
-If for some reason netfilter-persistent does not start automatically, you can check the status of the service by running the following command:
+[Install]
+WantedBy=multi-user.target
 ```
-systemctl status netfilter-persistent
+3. Save and close the file.
+4. Reload the systemd daemon to pick up the changes:
 ```
-If the service is not active, you can start it by running the following command:
+sudo systemctl daemon-reload
 ```
-sudo systemctl start netfilter-persistent
+5. Enable the service to run at boot time:
 ```
-You can also configure netfilter-persistent to start automatically at boot time by running the following command:
+sudo systemctl enable iptables-save.service
 ```
-sudo systemctl enable netfilter-persistent
+6. Start the service:
 ```
-
-Here are some useful commands for managing the firewall rules using netfilter-persistent on Ubuntu Server 22.04:
-1. sudo netfilter-persistent save - This command will save the current firewall rules and configuration to disk, so that they persist across reboots.
-2. sudo netfilter-persistent reload - This command will reload the firewall rules from disk, discarding any changes made since the last save.
-3. sudo netfilter-persistent flush - This command will flush all firewall rules and start with a clean slate. This is useful when you want to remove all existing firewall rules and start over.
-4. sudo netfilter-persistent status - This command will show the status of netfilter-persistent, including whether it is active, inactive, or inactive with errors.
-5. sudo iptables -L -n -v - This command will list the current IPTables rules, including any rules created using ipset, in a human-readable format.
-
-Note that the netfilter-persistent command should be run with root or sudo privileges, as it requires access to the firewall configuration.
+sudo systemctl start iptables-save.service
+```
+7. Check the status:
+```
+sudo systemctl status iptables-save.service
+```
